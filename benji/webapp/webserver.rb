@@ -17,15 +17,16 @@ post '/login' do
 	
 	if username == "admin" && password == "embedded"
 		session[:user] = username
-		redirect '/index'
+		redirect '/main_page'
 	else
 		redirect '/'
 	end
 end
 
-get '/index' do
+get '/main_page' do
 	if session[:user]
-		erb :index
+		@username = session[:user]
+		erb :main_page
 	else
 		redirect '/'
 	end
