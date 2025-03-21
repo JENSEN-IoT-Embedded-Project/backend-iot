@@ -1,15 +1,32 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IoT Data</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
   <h1>IoT Data</h1>
-  <p>Aktuell temperatur: <%= @temperature %>°C</p>
-
+  <table>
+	<tr>
+		<th>Sensor: </th>
+		<th>Motion detected: </th>
+		<th>Last triggered</th>
+		<th>Times triggered today</th>
+	</tr>
+	<tr>
+		<td>Ludvigs sensor</td>
+		<td>TRUE</td>
+		<td>5 min ago</td>
+		<td>6</td>
+	</tr>
+	<tr>
+                <td>Benjis sensor</td>
+                <td>FALSE</td>
+		<td>-</td>
+		<td>0</td>
+        </tr>
+  </table>
   <script src="/script.js"></script>
 </body>
 </html>
