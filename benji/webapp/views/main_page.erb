@@ -55,7 +55,28 @@
 
 		<div class="right-section">
 			<h1>Logged in as: <%= @username %></h1>
-			<h2>System Status: ONLINE</h2>
+			<h2>System Overview</h2>
+			<h3>System Status: OFFLINE</h3>
+			<table>
+				<tr>
+					<th>Device</th>
+					<th>Status</th>
+					<th>Last data</th>
+					<th>Update available</th>
+				</tr>
+				<tr>
+					<td>Motion Sensor</td>
+					<td>OFFLINE</td>
+					<td>N/A</td>
+					<td>FALSE</td>
+				</tr>
+				<tr>
+                                        <td>Camera</td>
+                                        <td>OFFLINE</td>
+                                        <td>N/A</td>
+					<td>FALSE</td>
+                                </tr>
+			</table>
 		</div>
 
 	</div>
