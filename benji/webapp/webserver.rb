@@ -26,6 +26,14 @@ get '/' do
 	erb :login
 end
 
+post '/check_password' do
+	content_type :json
+	data = JSON.parse(request.body.read)
+	password = data["password"]
+	result = `python3 password_checker.py #{password}`
+	result
+end
+
 post '/login' do
 	username = params[:username]
 	password = params[:pwd]
