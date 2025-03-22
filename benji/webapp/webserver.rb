@@ -47,6 +47,10 @@ get '/main_page' do
 	end
 end	
 
+get '/create_account' do
+	erb :create_account
+end
+
 get '/sub_pages/:page' do
 	if session[:user]
 		erb :"sub_pages/#{params[:page]}"
