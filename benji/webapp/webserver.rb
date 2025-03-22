@@ -7,6 +7,21 @@ set :port, 4567
 set :views, File.dirname(__FILE__) + '/views'
 set :public_folder, File.dirname(__FILE__) + '/public'
 
+configure do
+  set :view_folders, [settings.views, File.join(settings.views, "sub_pages")]
+end
+
+# Anpassad metod för att söka i flera mappar
+def find_template(views, filename, locals)
+  settings.view_folders.each do |view_folder|
+    path = File.join(view_folder, filename)
+    return path if File.exist?(path)
+  end
+  nil # Om ingen fil hittas
+end
+
+
+
 get '/' do
 	erb :login
 end
@@ -32,4 +47,10 @@ get '/main_page' do
 	end
 end	
 
-
+get '/sub_pages/:page' do
+	if session[:user]
+		erb :"sub_pages/#{params[:page]}"
+	else
+		redirect '/'
+	end
+end
