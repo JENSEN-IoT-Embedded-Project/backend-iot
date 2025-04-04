@@ -2,27 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-
-
-
-
-// FUNCTIONS
-
-
-void get_http_method(char* str){
-	printf("GHELO");
-	char temp_str[8]; // make room for OPTIONS & CONNECT
-	int i = 0;
-	for(i; i < 8; i++){
-		if(str[i] == ' '){
-			break;
-		}else{
-			temp_str[i] = str[i];
-		}
-	}
-	temp_str[i] = '\0';
-	printf("%s", temp_str);
-}
+#include "http_helpers.h"
 
 
 int main(){
@@ -69,10 +49,7 @@ int main(){
 		if(recieved_bytes < 0){
 			perror("Read msg from client failed\n");
 		}else{
-			printf("tah");
-			get_http_method(buffer);
-			printf("Hello");
-
+			printf("%s\n", get_http_method(buffer));
 		}
 		close(client_fd);
 	}
