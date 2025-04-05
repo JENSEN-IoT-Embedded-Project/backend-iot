@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
+
 #include "http_helpers.h"
 
 
@@ -39,7 +40,6 @@ int main(){
 		printf("Server is listening on port %d\n", PORT);
 	}
 
-
 	// MAIN LOOP
 
 	while(1){
@@ -50,6 +50,7 @@ int main(){
 			perror("Read msg from client failed\n");
 		}else{
 			printf("%s\n", get_http_method(buffer));
+			printf("%s\n", get_http_path(buffer));
 		}
 		close(client_fd);
 	}

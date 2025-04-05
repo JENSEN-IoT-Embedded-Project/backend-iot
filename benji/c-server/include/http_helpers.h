@@ -3,6 +3,6 @@
 
 
 char* get_http_method(char* str);
-
+char* get_http_path(char* str);
 
 #endif
