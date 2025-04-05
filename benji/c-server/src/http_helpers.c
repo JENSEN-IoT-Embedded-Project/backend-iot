@@ -1,7 +1,7 @@
 #include <stdbool.h>
+#include <stddef.h>
 
 #include "http_helpers.h"
-
 
 char* get_http_method(char* str){
 
@@ -15,7 +15,6 @@ char* get_http_method(char* str){
                 }
         }
         temp_str[i] = '\0';
-
         return temp_str;
 }
 
@@ -25,9 +24,9 @@ char* get_http_path(char* str){
 	int i2 = 0;
 	bool method_extracted = false;
 	bool is_path = false;
-	static char temp_str[20];
+	static char temp_str[1024];
 
-	for(i = 0; i < 30; i++){
+	for(i = 0; i < 1024; i++){
 		if(str[i] == ' '){
 			method_extracted = true;
 		}
@@ -40,8 +39,29 @@ char* get_http_path(char* str){
 		}else if(is_path){
 			temp_str[i2++] = str[i];
 		}
+	}
+	temp_str[i2] = '\0';
+	return temp_str;
+}
 
+char* get_http_version(char* str){
 
+	size_t space_count = 0;
+	static char temp_str[1024];
+	int i = 0;
+	int i2 = 0;
+	while(space_count < 2){
+		if(str[i] == ' '){
+			space_count++;
+		}
+		i++;
+	}
+	while(str[i] != ' ' && str[i] != '\0' && str[i] != '\n'){
+		if(i2 < sizeof(temp_str) - 1){
+			temp_str[i2++] = str[i++];
+		}else{
+			break;
+		}
 	}
 	temp_str[i2] = '\0';
 	return temp_str;

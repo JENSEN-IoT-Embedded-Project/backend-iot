@@ -51,6 +51,7 @@ int main(){
 		}else{
 			printf("%s\n", get_http_method(buffer));
 			printf("%s\n", get_http_path(buffer));
+			printf("%s\n", get_http_version(buffer));
 		}
 		close(client_fd);
 	}
