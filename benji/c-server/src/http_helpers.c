@@ -51,10 +51,9 @@ char* get_http_version(char* str){
 	int i = 0;
 	int i2 = 0;
 	while(space_count < 2){
-		if(str[i] == ' '){
+		if(str[i++] == ' '){
 			space_count++;
 		}
-		i++;
 	}
 	while(str[i] != ' ' && str[i] != '\0' && str[i] != '\n'){
 		if(i2 < sizeof(temp_str) - 1){
