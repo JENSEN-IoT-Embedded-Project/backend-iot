@@ -5,6 +5,7 @@
 
 #include "http_helpers.h"
 
+void* thread_function(void *arg);
 
 int main(){
 
@@ -43,18 +44,36 @@ int main(){
 	// MAIN LOOP
 
 	while(1){
-		char buffer[1024] = {0};
+
 		int client_fd = accept(server_fd, (struct sockaddr *)&address, &(socklen_t){sizeof(address)});
-		ssize_t recieved_bytes = read(client_fd, buffer, sizeof(buffer) - 1);
-		if(recieved_bytes < 0){
-			perror("Read msg from client failed\n");
+		if(client_fd == -1){
+			perror("Accept failed");
 		}else{
-			printf("%s\n", get_http_method(buffer));
-			printf("%s\n", get_http_path(buffer));
-			printf("%s\n", get_http_version(buffer));
+			pthread_t new_thread;
+			int if_thread_fail = pthread_create(new_thread, NULL, thread_function, (void*)&socket);
+			if(if_thread_fail != 0){ // if threadfunction failed
+				perror("Thread creation failed\n");
+			}
 		}
 		close(client_fd);
 	}
 	close(server_fd);
 	return 0;
+}
+
+
+void* thread_function(void *arg){
+	char buffer[1024] = {0};
+
+	int* client_socket = (int*)arg; // convert to exact type
+
+	int read_success = read(*client_socket, buffer, sizeof(buffer) - 1);
+
+	if(read_success == -1){
+		perror("Read data failed\n");
+	}else if(read_success == 0){
+		printf("Client disconnected\n");
+	}else{
+		buffer[read_success] = '\0';
+	}
 }
