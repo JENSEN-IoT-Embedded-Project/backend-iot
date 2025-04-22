@@ -77,8 +77,11 @@ void* thread_function(void *arg){
 	}else{
 		buffer[read_success] = '\0';
 		char* http_response = create_http_response(buffer);
-		int msg_sent = send(*client_socket, http_response, strlen(http_response), MSG_CONFIRM);
 
+		int msg_sent = send(*client_socket, http_response, strlen(http_response), MSG_NOSIGNAL);
+		if(msg_sent == -1){
+			perror("Message failed to send to client\n");
+		}
 	}
 	close(*client_socket);
 }
