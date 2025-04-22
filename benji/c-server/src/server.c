@@ -54,7 +54,7 @@ int main(){
 			pthread_t new_thread;
 			int* client_fd = malloc(sizeof(int));
 			*client_fd = socket;
-			int if_thread_fail = pthread_create(&new_thread, NULL, thread_function, (void*)&client_fd);
+			int if_thread_fail = pthread_create(&new_thread, NULL, thread_function, (void*)client_fd);
 			if(if_thread_fail != 0){ // if threadfunction failed
 				perror("Thread creation failed\n");
 			}
@@ -80,10 +80,10 @@ void* thread_function(void *arg){
 		buffer[read_success] = '\0';
 		char* http_response = create_http_response(buffer);
 
-		int msg_sent = send(*client_socket, http_response, strlen(http_response), MSG_NOSIGNAL);
+		int msg_sent = send(client_socket, http_response, strlen(http_response), MSG_NOSIGNAL);
 		if(msg_sent == -1){
 			perror("Message failed to send to client\n");
 		}
 	}
-	close(*client_socket);
+	close(client_socket);
 }
