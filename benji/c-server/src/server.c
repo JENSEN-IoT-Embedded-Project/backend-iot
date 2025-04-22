@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
+#include <pthread.h>
+#include <string.h>
 
 #include "http_helpers.h"
 
@@ -45,17 +47,16 @@ int main(){
 
 	while(1){
 
-		int client_fd = accept(server_fd, (struct sockaddr *)&address, &(socklen_t){sizeof(address)});
-		if(client_fd == -1){
+		int socket = accept(server_fd, (struct sockaddr *)&address, &(socklen_t){sizeof(address)});
+		if(socket == -1){
 			perror("Accept failed");
 		}else{
 			pthread_t new_thread;
-			int if_thread_fail = pthread_create(new_thread, NULL, thread_function, (void*)&socket);
+			int if_thread_fail = pthread_create(&new_thread, NULL, thread_function, (void*)&socket);
 			if(if_thread_fail != 0){ // if threadfunction failed
 				perror("Thread creation failed\n");
 			}
 		}
-		close(client_fd);
 	}
 	close(server_fd);
 	return 0;
@@ -75,5 +76,9 @@ void* thread_function(void *arg){
 		printf("Client disconnected\n");
 	}else{
 		buffer[read_success] = '\0';
+		char* http_response = create_http_response(buffer);
+		int msg_sent = send(*client_socket, http_response, strlen(http_response), MSG_CONFIRM);
+
 	}
+	close(*client_socket);
 }

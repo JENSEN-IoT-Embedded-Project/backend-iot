@@ -1,5 +1,8 @@
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "http_helpers.h"
 
@@ -64,4 +67,46 @@ char* get_http_version(char* str){
 	}
 	temp_str[i2] = '\0';
 	return temp_str;
+}
+
+char* create_http_response(char* str){
+	char* method = get_http_method(str);
+	char* path = get_http_path(str);
+	char* version = get_http_version(str);
+
+	if(strcmp(method, "GET") == 0){
+
+		FILE* file = fopen(path + 1, "r");
+		if(!file){
+			char* not_found = malloc(256);
+			snprintf(not_found, 256,
+				"%s 404 Not Found\r\n"
+				"Content-Type: text/playin\r\n"
+				"Content-Length: 13\r\n"
+				"Connection: close\r\n"
+				"\r\n"
+				"404 Not Found", version);
+			return not_found;
+		}
+
+		fseek(file, 0, SEEK_END);
+		long length = ftell(file);
+		fseek(file, 0, SEEK_SET);
+
+		char* body = malloc(length + 1);
+		fread(body, 1, length, file);
+		body[length] = '\0';
+		fclose(file);
+
+		char* response = malloc(length + 512);
+		snprintf(response, length + 512,
+			"%s 200 OK\r\n"
+			"Content-Type: text/html\r\n"
+			"Content-Length: %ld\r\n"
+			"Connection: close\r\n"
+			"\r\n"
+			"%s", version, length, body);
+		free(body);
+		return response;
+	}
 }
