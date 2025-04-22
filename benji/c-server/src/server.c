@@ -52,7 +52,9 @@ int main(){
 			perror("Accept failed");
 		}else{
 			pthread_t new_thread;
-			int if_thread_fail = pthread_create(&new_thread, NULL, thread_function, (void*)&socket);
+			int* client_fd = malloc(sizeof(int));
+			*client_fd = socket;
+			int if_thread_fail = pthread_create(&new_thread, NULL, thread_function, (void*)&client_fd);
 			if(if_thread_fail != 0){ // if threadfunction failed
 				perror("Thread creation failed\n");
 			}
@@ -62,11 +64,11 @@ int main(){
 	return 0;
 }
 
-
 void* thread_function(void *arg){
 	char buffer[1024] = {0};
 
-	int* client_socket = (int*)arg; // convert to exact type
+	int client_socket = *((int*)arg); // convert to exact type
+	free(arg);
 
 	int read_success = read(*client_socket, buffer, sizeof(buffer) - 1);
 
