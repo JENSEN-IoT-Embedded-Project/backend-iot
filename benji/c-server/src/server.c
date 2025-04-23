@@ -4,14 +4,19 @@
 #include <errno.h>
 #include <pthread.h>
 #include <string.h>
+#include <signal.h>
+#include <stdlib.h>
 
 #include "http_helpers.h"
 
 void* thread_function(void *arg);
+void handle_sigint(int sig);
+
+int server_fd;
 
 int main(){
 
-	// GLOBALS
+	signal(SIGINT, handle_sigint);
 
 	const int PORT = 8080;
 
@@ -47,14 +52,15 @@ int main(){
 
 	while(1){
 
-		int socket = accept(server_fd, (struct sockaddr *)&address, &(socklen_t){sizeof(address)});
-		if(socket == -1){
+		int client_socket = accept(server_fd, (struct sockaddr *)&address, &(socklen_t){sizeof(address)});
+		if(client_socket == -1){
 			perror("Accept failed");
 		}else{
 			pthread_t new_thread;
 			int* client_fd = malloc(sizeof(int));
-			*client_fd = socket;
-			if(pthread_create(&new_thread, NULL, thread_function, (void*)client_fd)){
+			*client_fd = client_socket;
+			int thread_result = pthread_create(&new_thread, NULL, thread_function, (void*)client_fd);
+			if(thread_result != 0){
 				perror("Thread creation failed\n");
 				free(client_fd);
 			}else{
@@ -79,7 +85,9 @@ void* thread_function(void *arg){
 	}else if(read_success == 0){
 		printf("Client disconnected\n");
 	}else{
-		buffer[read_success] = '\0';
+		if(read_success < sizeof(buffer)){
+			buffer[read_success] = '\0';
+		}
 		char* http_response = create_http_response(buffer);
 
 		int msg_sent = send(client_socket, http_response, strlen(http_response), MSG_NOSIGNAL);
@@ -88,4 +96,12 @@ void* thread_function(void *arg){
 		}
 	}
 	close(client_socket);
+}
+
+void handle_sigint(int sig){
+	printf("\nCaught SIGINT, shutting down server...\n");
+	if(server_fd != -1){
+		close(server_fd);
+	}
+	exit(0);
 }

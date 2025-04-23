@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "http_helpers.h"
 
@@ -108,5 +109,47 @@ char* create_http_response(char* str){
 			"%s", version, length, body);
 		free(body);
 		return response;
+	}else if(strcmp(method, "POST") == 0){
+		;
+	}else if(strcmp(method, "DELETE") == 0){
+		const char* filepath = path + 1;
+		FILE* file = fopen(path + 1, "r");
+		if(!file){
+			char* not_found = malloc(256);
+			snprintf(not_found, 256,
+				"%s 404 Not Found\r\n"
+				"Content-Type: text/plain\r\n"
+				"\r\nResource not found.\n", version);
+			return not_found;
+		}else{
+			fclose(file);
+
+			if(remove(filepath) == 0){
+				char* ok_response = malloc(256);
+				snprintf(ok_response, 256,
+					"%s 200 OK\r\n"
+					"Content-Type: text/plain\r\n"
+					"\r\nResource deleted successfully.\n", version);
+				return ok_response;
+			}else{
+				char* fail_response = malloc(256);
+
+				if(errno == EACCES || errno == EPERM){
+					snprintf(fail_response, 256,
+						"%s 403 Forbidden\r\n"
+						"Content-Type: text/plain\r\n"
+						"\r\nCould not delete the resource.\n", version);
+					return fail_response;
+				}else{
+					snprintf(fail_response, 256,
+						"%s 500 Internal Server Error\r\n"
+						"Content-Type: text/plain\r\n"
+						"\r\nCould not delete the resource.\n", version);
+					return fail_response;
+				}
+			}
+		}
+	}else if(strcmp(method, "PUT") == 0){
+		;
 	}
 }

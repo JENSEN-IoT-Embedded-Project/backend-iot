@@ -7,7 +7,7 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(('localhost', 8080))
 
 # Skapa HTTP GET-förfrågan
-http_request = """GET /index.html HTTP/1.1\r\n\
+http_request = """DELETE /index.html HTTP/1.1\r\n\
 Host: localhost:8080\r\n\
 User-Agent: PythonSocketClient\r\n\
 Accept: text/html\r\n\
