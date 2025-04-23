@@ -54,9 +54,11 @@ int main(){
 			pthread_t new_thread;
 			int* client_fd = malloc(sizeof(int));
 			*client_fd = socket;
-			int if_thread_fail = pthread_create(&new_thread, NULL, thread_function, (void*)client_fd);
-			if(if_thread_fail != 0){ // if threadfunction failed
+			if(pthread_create(&new_thread, NULL, thread_function, (void*)client_fd)){
 				perror("Thread creation failed\n");
+				free(client_fd);
+			}else{
+				pthread_detach(new_thread);
 			}
 		}
 	}
@@ -70,7 +72,7 @@ void* thread_function(void *arg){
 	int client_socket = *((int*)arg); // convert to exact type
 	free(arg);
 
-	int read_success = read(*client_socket, buffer, sizeof(buffer) - 1);
+	int read_success = read(client_socket, buffer, sizeof(buffer) - 1);
 
 	if(read_success == -1){
 		perror("Read data failed\n");
