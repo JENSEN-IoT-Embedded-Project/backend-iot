@@ -1,11 +1,17 @@
 require 'sinatra'
 require 'json'
+require 'mqtt'
+require 'thread'
 
 enable :sessions
 
 set :port, 4567
 set :views, File.dirname(__FILE__) + '/views'
 set :public_folder, File.dirname(__FILE__) + '/public'
+
+$latest_mqtt_data = {}
+$mqtt_mutex = Mutex.new
+
 
 configure do
   set :view_folders, [settings.views, File.join(settings.views, "sub_pages")]
@@ -20,10 +26,39 @@ def find_template(views, filename, locals)
   nil # Om ingen fil hittas
 end
 
+Thread.new do
+	MQTT::Client.connect('test.mosquitto.org', ack_timeout: 30) do |client|
+		client.subscribe('test/lol') #### topic here
 
+		client.get do |topic, message|
+			message = message.force_encoding('UTF-8')
+				.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+			puts "Recieved from #{topic}: #{message}"
+		if message.strip.start_with?('{')
+			begin
+				require 'json'
+				data = JSON.parse(message)
+				$mqtt_mutex.synchronize do
+  					$latest_mqtt_data[topic] = data
+end
+			puts "Stored data for #{topic}: #{$latest_mqtt_data[topic]}"
+			rescue JSON::ParserError => e
+				puts "Could not parse JSON: #{e.message}"
+			end	
+			end
+		end
+	end
+end
 
 get '/' do
 	erb :login
+end
+
+get '/mqtt_data' do
+  content_type :json
+  $mqtt_mutex.synchronize do
+    $latest_mqtt_data.to_json
+  end
 end
 
 post '/check_password' do

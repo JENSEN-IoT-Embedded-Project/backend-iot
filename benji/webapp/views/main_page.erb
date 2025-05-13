@@ -57,6 +57,7 @@
 			<h1>Logged in as: <%= @username %></h1>
 			<h2>System Overview</h2>
 			<h3>System Status: OFFLINE</h3>
+
 			<table>
 				<tr>
 					<th>Device</th>
@@ -65,9 +66,15 @@
 					<th>Update available</th>
 				</tr>
 				<tr>
-					<td>Motion Sensor</td>
-					<td>OFFLINE</td>
-					<td>N/A</td>
+					<td>
+						<div id="device-id-container"></div>
+					</td>
+					<td>
+						<div id="device-status-container"></div>
+					</td>
+					<td>
+						<div id="motion-sensor-data-container"></div>
+					</td>
 					<td>FALSE</td>
 				</tr>
 				<tr>
@@ -81,5 +88,32 @@
 
 	</div>
 	<div class="footer"></div>
+	<script>
+		async function updateMQTTData() {
+			const res = await fetch('/mqtt_data');  // Hämta MQTT-data från servern
+			const json = await res.json();
+			let deviceStatus;
+	
+			// Hämta senaste data för motion-sensor
+			const deviceID = json['test/lol']?.['device-id'] || 'No device connected';
+			if(deviceID !== 'No device connected'){
+				deviceStatus = "ONLINE";
+			}else{
+				deviceStatus = "OFFLINE";
+			}
+			const motionSensorData = json['test/lol']?.['motion-sensor'] || 'No data available';
+			
+			
+
+			// Uppdatera div med ID "motion-sensor-data-container"
+			document.getElementById('motion-sensor-data-container').innerText = motionSensorData;
+			document.getElementById('device-id-container').innerText = deviceID;
+			document.getElementById('device-status-container').innerText = deviceStatus;
+		}
+		
+		setInterval(updateMQTTData, 3000);
+		updateMQTTData();
+	</script>
+
 </body>
 </html>
