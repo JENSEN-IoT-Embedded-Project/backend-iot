@@ -56,7 +56,7 @@
 		<div class="right-section">
 			<h1>Logged in as: <%= @username %></h1>
 			<h2>System Overview</h2>
-			<h3>System Status: OFFLINE</h3>
+			<h3>System Status:</h3>
 
 			<table>
 				<tr>
@@ -95,13 +95,13 @@
 			let deviceStatus;
 	
 			// Hämta senaste data för motion-sensor
-			const deviceID = json['test/lol']?.['device-id'] || 'No device connected';
+			const deviceID = json['sensors/simon-pico']?.['device-id'] || 'No device connected';
 			if(deviceID !== 'No device connected'){
 				deviceStatus = "ONLINE";
 			}else{
 				deviceStatus = "OFFLINE";
 			}
-			const motionSensorData = json['test/lol']?.['motion-sensor'] || 'No data available';
+			const motionSensorData = json['sensors/simon-pico']?.['distance'] || 'No data available';
 			
 			
 

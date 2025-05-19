@@ -27,8 +27,8 @@ def find_template(views, filename, locals)
 end
 
 Thread.new do
-	MQTT::Client.connect('test.mosquitto.org', ack_timeout: 30) do |client|
-		client.subscribe('test/lol') #### topic here
+	MQTT::Client.connect('94.255.229.51', ack_timeout: 30) do |client|
+		client.subscribe('sensors/simon-pico') #### topic here
 
 		client.get do |topic, message|
 			message = message.force_encoding('UTF-8')
